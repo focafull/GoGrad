@@ -15,6 +15,7 @@ func TestAdd(t *testing.T) {
 	Expect(res.data).To(Equal(7.))
 	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1.))
@@ -24,8 +25,8 @@ func TestAdd(t *testing.T) {
 	v2.SetData(5)
 	res.Forward()
 	Expect(res.data).To(Equal(11.))
-	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1.))
@@ -40,6 +41,7 @@ func TestSub(t *testing.T) {
 	Expect(res.data).To(Equal(-1.))
 	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1.))
@@ -49,8 +51,8 @@ func TestSub(t *testing.T) {
 	v2.SetData(2)
 	res.Forward()
 	Expect(res.data).To(Equal(4.))
-	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1.))
@@ -63,8 +65,8 @@ func TestMult(t *testing.T) {
 	v2 := Value(4)
 	res := v1.Mult(v2)
 	Expect(res.data).To(Equal(12.))
-	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(4.))
@@ -74,8 +76,8 @@ func TestMult(t *testing.T) {
 	v2.SetData(5)
 	res.Forward()
 	Expect(res.data).To(Equal(30.))
-	Expect(res.grad).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(5.))
@@ -89,6 +91,7 @@ func TestDiv(t *testing.T) {
 	res := v1.Div(v2)
 	Expect(res.data).To(Equal(3. / 4.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1. / 4.))
@@ -99,6 +102,7 @@ func TestDiv(t *testing.T) {
 	res.Forward()
 	Expect(res.data).To(Equal(6. / 5.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1. / 5.))
@@ -111,6 +115,7 @@ func TestPow(t *testing.T) {
 	res := v1.Pow(2)
 	Expect(res.data).To(Equal(9.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(2. * 3.))
@@ -119,6 +124,7 @@ func TestPow(t *testing.T) {
 	res.Forward()
 	Expect(res.data).To(Equal(36.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(2. * 6.))
@@ -130,6 +136,7 @@ func TestReLU(t *testing.T) {
 	res := v1.ReLU()
 	Expect(res.data).To(Equal(3.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(1.))
@@ -138,10 +145,31 @@ func TestReLU(t *testing.T) {
 	res.Forward()
 	Expect(res.data).To(Equal(0.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(0.))
+}
 
+func TestLogistic(t *testing.T) {
+	setup(t)
+	v1 := Value(3)
+	res := v1.Logistic()
+	Expect(fmt.Sprintf("%.4f", res.data)).To(Equal("0.9526"))
+
+	res.Zero_grad()
+	res.Backward()
+	Expect(res.grad).To(Equal(1.))
+	Expect(fmt.Sprintf("%.4f", v1.grad)).To(Equal("0.0452"))
+
+	v1.SetData(-1)
+	res.Forward()
+	Expect(fmt.Sprintf("%.4f", res.data)).To(Equal("0.2689"))
+
+	res.Zero_grad()
+	res.Backward()
+	Expect(res.grad).To(Equal(1.))
+	Expect(fmt.Sprintf("%.4f", v1.grad)).To(Equal("0.1966"))
 }
 
 func TestMore(t *testing.T) {
@@ -154,6 +182,7 @@ func TestMore(t *testing.T) {
 	res := v1.Mult(v2).Add(v3).Sub(v4)
 	Expect(res.data).To(Equal(11.))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(4.))
@@ -168,6 +197,7 @@ func TestMore(t *testing.T) {
 	res.Forward()
 	Expect(fmt.Sprintf("%.2f", res.data)).To(Equal("-2.05"))
 
+	res.Zero_grad()
 	res.Backward()
 	Expect(res.grad).To(Equal(1.))
 	Expect(v1.grad).To(Equal(.5))

@@ -30,7 +30,7 @@ func NewNeuron(prevLayer layer) *neuron {
 		}
 
 		// + bias
-		neuron.v = prevTerm.Add(neuron.bias).ReLU()
+		neuron.v = prevTerm.Add(neuron.bias).Logistic()
 	} else {
 		// else it is an input neuron
 		neuron.v = Value(0)

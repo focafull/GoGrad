@@ -175,6 +175,24 @@ func (self *value) ReLU() *value {
 	return out
 }
 
+func (self *value) Logistic() *value {
+	out := makeNext(
+		1/(1+math.Exp(-1*self.data)),
+		[]*value{self},
+		"Logi",
+	)
+
+	out._backward = func() { // (e^x) / (1+e^x)^2
+		self.grad += (math.Exp(self.data) / (math.Pow(1+math.Exp(self.data), 2))) * out.grad
+	}
+
+	out._forward = func() { // 1 / (1+e^x)
+		out.data = 1 / (1 + math.Pow(math.E, -1*self.data))
+	}
+
+	return out
+}
+
 func (self *value) Backward() {
 	self.grad = 1
 	self._backward()
